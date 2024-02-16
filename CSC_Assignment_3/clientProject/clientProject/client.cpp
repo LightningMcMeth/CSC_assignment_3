@@ -4,6 +4,7 @@
 #include <winsock2.h>
 #include <Ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
+
 void receiveMessages(SOCKET clientSocket) {
 	char buffer[4096];
 	while (true) {
@@ -16,6 +17,7 @@ void receiveMessages(SOCKET clientSocket) {
 		std::cout << "Server: " << buffer << std::endl;
 	}
 }
+
 int main() {
 
 	WSADATA wsaData;
@@ -29,10 +31,12 @@ int main() {
 		WSACleanup();
 		return 1;
 	}
+
 	sockaddr_in serverAddr;
 	serverAddr.sin_family = AF_INET;
 	InetPton(AF_INET, L"127.0.0.1", &serverAddr.sin_addr);
 	serverAddr.sin_port = htons(8080);
+
 	if (connect(clientSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) ==
 		SOCKET_ERROR) {
 		std::cerr << "Connection failed.\n";
@@ -41,9 +45,15 @@ int main() {
 		return 1;
 	}
 	std::cout << "Connected to server.\n";
-	// Start a thread to receive messages from the server
+
 	std::thread receiveThread(receiveMessages, clientSocket);
-	// Main thread to send messages to the server
+
+	std::string roomID;
+	std::cout << "\nEnter room ID: ";
+	std::cin >> roomID;
+
+	send(clientSocket, roomID.c_str(), roomID.size(), 0);
+		
 	std::string message;
 	while (true) {
 		std::getline(std::cin, message);
@@ -53,4 +63,4 @@ int main() {
 	closesocket(clientSocket);
 	WSACleanup();
 	return 0;
-}
+}
