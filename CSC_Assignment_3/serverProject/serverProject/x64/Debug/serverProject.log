@@ -1,0 +1,26 @@
+﻿  server.cpp
+C:\Users\markh\OneDrive\Documents\Gamer repositories\CSC_ASSIGNMENTS\CSC_assignment_3\CSC_Assignment_3\serverProject\serverProject\server.cpp(42,49): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\markh\OneDrive\Documents\Gamer repositories\CSC_ASSIGNMENTS\CSC_assignment_3\CSC_Assignment_3\serverProject\serverProject\server.cpp(54,49): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\thread(55,14): error C2672: 'invoke': no matching overloaded function found
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\type_traits(1756,19): message : could be 'unknown-type std::invoke(_Callable &&,_Ty1 &&,_Types2 &&...) noexcept(<expr>)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\thread(55,14): message : Failed to specialize function template 'unknown-type std::invoke(_Callable &&,_Ty1 &&,_Types2 &&...) noexcept(<expr>)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\thread(55,14): message : With the following template arguments:
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\thread(55,14): message : '_Callable=void (__cdecl *)(std::queue<Message,std::deque<Message,std::allocator<Message>>> &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\thread(55,14): message : '_Ty1=std::queue<Message,std::deque<Message,std::allocator<Message>>>'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\thread(55,14): message : '_Types2={}'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\type_traits(1759,50): message : 'std::_Invoker_functor::_Call': no matching overloaded function found
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\type_traits(1656,27): message : could be 'unknown-type std::_Invoker_functor::_Call(_Callable &&,_Types &&...) noexcept(<expr>)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\type_traits(1750,19): message : or       'unknown-type std::invoke(_Callable &&) noexcept(<expr>)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\thread(55,14): message : 'unknown-type std::invoke(_Callable &&) noexcept(<expr>)': expects 1 arguments - 2 provided
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\thread(62,17): message : see reference to function template instantiation 'unsigned int std::thread::_Invoke<_Tuple,0,1>(void *) noexcept' being compiled
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\thread(71,40): message : see reference to function template instantiation 'unsigned int (__cdecl *std::thread::_Get_invoke<_Tuple,0,1>(std::integer_sequence<size_t,0,1>) noexcept)(void *)' being compiled
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.37.32822\include\thread(88,9): message : see reference to function template instantiation 'void std::thread::_Start<void(__cdecl &)(std::queue<Message,std::deque<Message,std::allocator<Message>>> &),std::queue<Message,std::deque<Message,std::allocator<Message>>>&>(_Fn,std::queue<Message,std::deque<Message,std::allocator<Message>>> &)' being compiled
+          with
+          [
+              _Fn=void (__cdecl &)(std::queue<Message,std::deque<Message,std::allocator<Message>>> &)
+          ]
+C:\Users\markh\OneDrive\Documents\Gamer repositories\CSC_ASSIGNMENTS\CSC_assignment_3\CSC_Assignment_3\serverProject\serverProject\server.cpp(108,25): message : see reference to function template instantiation 'std::thread::thread<void(__cdecl &)(std::queue<Message,std::deque<Message,std::allocator<Message>>> &),std::queue<Message,std::deque<Message,std::allocator<Message>>>&,0>(_Fn,std::queue<Message,std::deque<Message,std::allocator<Message>>> &)' being compiled
+          with
+          [
+              _Fn=void (__cdecl &)(std::queue<Message,std::deque<Message,std::allocator<Message>>> &)
+          ]

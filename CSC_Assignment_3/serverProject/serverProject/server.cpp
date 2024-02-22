@@ -5,12 +5,32 @@
 #include <mutex>
 #include <map>
 #include <winsock2.h>
+#include <queue>
 #pragma comment(lib, "ws2_32.lib")
+
+struct Message {
+	int roomId;
+	SOCKET senderSocket;
+	std::string message;
+};
 
 std::mutex consoleMutex;
 std::vector<SOCKET> clients;
 std::map<int, std::vector<SOCKET>> rooms;
 std::vector<std::thread> roomThreads;
+
+
+std::mutex messageQueueMutex;
+std::condition_variable messageAvailableCondition;
+std::queue<Message> messageQueue;
+
+void addMessageToQueue(const Message& message) {
+	{
+		std::lock_guard<std::mutex> lock(messageQueueMutex);
+		messageQueue.push(message);
+	}
+	messageAvailableCondition.notify_one();
+}
 
 void broadcastMessage(const std::string& message, SOCKET senderSocket) {
 
@@ -65,31 +85,24 @@ void handleClient(SOCKET clientSocket) {
 }
 
 
-void handleRoom(std::pair<int, std::vector<SOCKET>>& room) {
-	//This stuff should be looped and message queue vars should be declared here, before the loop
+void handleRoom(std::queue<Message>& messageQueue) {
 
-	std::string message;
 	while (true) {
-		std::getline(std::cin, message);
 
-		//broadcastMessageInRoom(message, );
 	}
 
 }
 
 int main() {
-	//creating rooms. Num of rooms and their ids are hardcoded
 	rooms.insert(std::make_pair(0, std::vector<SOCKET>()));
 	rooms.insert(std::make_pair(1, std::vector<SOCKET>()));
 	rooms.insert(std::make_pair(2, std::vector<SOCKET>()));
 
-	//creating threads here for the rooms
-	for (auto& room : rooms) {
-		std::thread roomThread(handleRoom, room);
+	for (auto room : rooms) {
+		std::thread roomThread(handleRoom, messageQueue);
 		roomThread.detach();
-		//roomThreads.push_back(roomThread); //I think storing them is literally useless lol
 	}
-
+		
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
 		std::cerr << "WSAStartup failed.\n";

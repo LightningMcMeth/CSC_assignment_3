@@ -59,7 +59,7 @@ int main() {
 		std::getline(std::cin, message);
 		send(clientSocket, message.c_str(), message.size() + 1, 0);
 	}
-	// Close the socket and clean up
+
 	closesocket(clientSocket);
 	WSACleanup();
 	return 0;
