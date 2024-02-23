@@ -5,6 +5,14 @@
 #include <Ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 
+void sendRoomId(SOCKET clientSocket) {
+	std::string roomID;
+	std::cout << "\nEnter room ID: ";
+	std::cin >> roomID;
+
+	send(clientSocket, roomID.c_str(), roomID.size(), 0);
+}
+
 void receiveMessages(SOCKET clientSocket) {
 	char buffer[4096];
 	while (true) {
@@ -13,7 +21,9 @@ void receiveMessages(SOCKET clientSocket) {
 			std::cerr << "Server disconnected.\n";
 			break;
 		}
+
 		buffer[bytesReceived] = '\0';
+
 		std::cout << "Server: " << buffer << std::endl;
 	}
 }
@@ -48,15 +58,12 @@ int main() {
 
 	std::thread receiveThread(receiveMessages, clientSocket);
 
-	std::string roomID;
-	std::cout << "\nEnter room ID: ";
-	std::cin >> roomID;
+	sendRoomId(clientSocket);
 
-	send(clientSocket, roomID.c_str(), roomID.size(), 0);
-		
 	std::string message;
 	while (true) {
 		std::getline(std::cin, message);
+
 		send(clientSocket, message.c_str(), message.size() + 1, 0);
 	}
 

@@ -18,7 +18,8 @@ std::mutex consoleMutex;
 std::vector<SOCKET> clients;
 std::map<int, std::vector<SOCKET>> rooms;
 std::vector<std::thread> roomThreads;
-
+std::mutex clientHandlerMutex;
+std::mutex addClientMutex;
 
 std::mutex messageQueueMutex;
 std::condition_variable messageAvailableCondition;
@@ -56,14 +57,30 @@ void broadcastMessageInRoom(const std::string& message, SOCKET senderSocket, std
 	}
 }
 
+int addClientToRoom(SOCKET clientSocket) {
+
+	char idBuffer[3];
+	
+	int bytesReceived = recv(clientSocket, idBuffer, sizeof(idBuffer) - 1, 0);
+	idBuffer[bytesReceived] = '\0';
+
+	std::lock_guard<std::mutex> lock(consoleMutex);
+	std::cout << "Client No " << clientSocket << " joined room with ID " << idBuffer << '\n';
+
+	std::unique_lock<std::mutex> addClientLock(clientHandlerMutex);
+	int roomID = std::atoi(idBuffer);
+	rooms[roomID].push_back(clientSocket);
+
+	addClientLock.unlock();
+
+	return roomID;
+}
+
 void handleClient(SOCKET clientSocket) {
 
-	clients.push_back(clientSocket);
+	//clients.push_back(clientSocket);
 
-	char roomID[2];
-	recv(clientSocket, roomID, sizeof(roomID), 0);
-	std::cout << "Client No " << clientSocket << " joined room with ID " << roomID;
-	rooms[std::atoi(roomID)].push_back(clientSocket);
+	int roomID = addClientToRoom(clientSocket);
 
 	char buffer[4096];
 	while (true) {
@@ -76,19 +93,49 @@ void handleClient(SOCKET clientSocket) {
 			break;
 		}
 
-		//buffer[bytesReceived] = '\0';
-		//std::string message(buffer);
+		std::string messageStr(buffer);
 
-		//broadcastMessage(message, clientSocket);
+		if (messageStr == "/leave") {
+
+
+			std::unique_lock<std::mutex> lock(clientHandlerMutex);
+			auto socketIt = std::find(rooms[roomID].begin(), rooms[roomID].end(), clientSocket);
+
+			if (socketIt != rooms[roomID].end()) {
+				rooms[roomID].erase(socketIt);
+			}
+			lock.unlock();
+
+			std::string msg = "/leave";
+			send(clientSocket, msg.c_str(), msg.size() + 1, 0);
+
+			roomID = addClientToRoom(clientSocket);
+
+			continue;
+		}
+
+		Message message = { roomID, clientSocket, messageStr };
+		addMessageToQueue(message);
 	}
 	closesocket(clientSocket);
 }
 
 
-void handleRoom(std::queue<Message>& messageQueue) {
+void handleRoom() {
 
 	while (true) {
 
+		std::unique_lock<std::mutex> lock(messageQueueMutex);
+		messageAvailableCondition.wait(lock, [] { return !messageQueue.empty(); });
+
+		Message message = messageQueue.front();
+		messageQueue.pop();
+
+		lock.unlock();
+
+		std::unique_lock<std::mutex> roomsLock(clientHandlerMutex);
+		broadcastMessageInRoom(message.message, message.senderSocket, rooms[message.roomId]);
+		roomsLock.unlock();
 	}
 
 }
@@ -99,10 +146,10 @@ int main() {
 	rooms.insert(std::make_pair(2, std::vector<SOCKET>()));
 
 	for (auto room : rooms) {
-		std::thread roomThread(handleRoom, messageQueue);
+		std::thread roomThread(handleRoom);
 		roomThread.detach();
 	}
-		
+
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
 		std::cerr << "WSAStartup failed.\n";
@@ -158,12 +205,3 @@ int main() {
 	WSACleanup();
 	return 0;
 }
-
-//TODO:
-	//1) Finish implementing multiple rooms.
-	//2) Implement message queues.
-
-	//I understand what I didn't previously:
-	//Each client already has their own thread, so is it really necessary to create a thread per room?
-	//I can simply add them to the appropriate room inside of handleClient.
-	//What would be the difference in implementing rooms with separate threads per rooma and without and is it mandatory?
