@@ -24,7 +24,7 @@ void receiveMessages(SOCKET clientSocket) {
 
 		buffer[bytesReceived] = '\0';
 
-		std::cout << "Server: " << buffer << std::endl;
+		std::cout << buffer << std::endl;
 	}
 }
 

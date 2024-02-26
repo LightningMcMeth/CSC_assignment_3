@@ -50,9 +50,10 @@ void broadcastMessageInRoom(const std::string& message, SOCKET senderSocket, std
 	std::lock_guard<std::mutex> lock(consoleMutex);
 	std::cout << "Client " << senderSocket << ": " << message << std::endl;
 
+	std::string messageWithSocket = "Client " + std::to_string(senderSocket) + ": " + message;
 	for (SOCKET client : clients) {
 		if (client != senderSocket) {
-			send(client, message.c_str(), message.size() + 1, 0);
+			send(client, messageWithSocket.c_str(), messageWithSocket.size() + 1, 0);
 		}
 	}
 }
@@ -199,7 +200,7 @@ int main() {
 		std::cout << "Client " << clientSocket << " connected.\n";
 
 		std::thread clientThread(handleClient, clientSocket);
-		clientThread.detach(); // Detach the thread to allow handling multiple clients concurrently
+		clientThread.detach();
 	}
 	closesocket(serverSocket);
 	WSACleanup();
